@@ -31,6 +31,15 @@ def resolve_within(path: Any, roots: Iterable[Path], *, must_exist: bool = False
         except ValueError:
             continue
         if must_exist and not candidate.exists():
+            cand_str = str(candidate)
+            found = None
+            for norm in [unicodedata.normalize("NFD", cand_str), unicodedata.normalize("NFC", cand_str)]:
+                p_norm = Path(norm)
+                if p_norm.exists():
+                    found = p_norm
+                    break
+            if found is not None:
+                return found
             raise ValidationError(
                 f"Không thấy file: {candidate}",
                 hint="Kiểm tra lại tên file, hoặc chép file vào data/raw trước khi gọi lại.",

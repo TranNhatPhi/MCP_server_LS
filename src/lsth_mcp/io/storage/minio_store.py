@@ -86,23 +86,46 @@ class MinioStore:
 
     # ---- đọc --------------------------------------------------------------
 
+    def resolve_key(self, key: str) -> Optional[str]:
+        """Chuẩn hoá Unicode (NFC/NFD) và tìm key phù hợp trong bucket."""
+        import unicodedata
+        cleaned = check_key(key)
+        for variant in [cleaned, unicodedata.normalize("NFD", cleaned), unicodedata.normalize("NFC", cleaned)]:
+            try:
+                self.client.stat_object(self.bucket, variant)
+                return variant
+            except S3Error:
+                pass
+
+        q_norm = unicodedata.normalize("NFC", cleaned).lower()
+        candidates = []
+        for obj in self.list(limit=2000):
+            k_norm = unicodedata.normalize("NFC", obj.key).lower()
+            if k_norm == q_norm or k_norm.endswith("/" + q_norm):
+                candidates.append(obj.key)
+        if len(candidates) == 1:
+            return candidates[0]
+        elif len(candidates) > 1:
+            for c in candidates:
+                if c.endswith(cleaned) or unicodedata.normalize("NFC", c).endswith(q_norm):
+                    return c
+            return candidates[0]
+        return None
+
     def uri(self, key: str) -> str:
-        return f"s3://{self.bucket}/{check_key(key)}"
+        resolved = self.resolve_key(key) or check_key(key)
+        return f"s3://{self.bucket}/{resolved}"
 
     def exists(self, key: str) -> bool:
-        try:
-            self.client.stat_object(self.bucket, check_key(key))
-            return True
-        except S3Error:
-            return False
+        return self.resolve_key(key) is not None
 
     def stat(self, key: str) -> ObjectInfo:
-        key = check_key(key)
+        resolved = self.resolve_key(key) or check_key(key)
         try:
-            st = self.client.stat_object(self.bucket, key)
+            st = self.client.stat_object(self.bucket, resolved)
         except S3Error as exc:
-            raise self._not_found(key, exc) from exc
-        return ObjectInfo(key=key, size=st.size, last_modified=st.last_modified,
+            raise self._not_found(resolved, exc) from exc
+        return ObjectInfo(key=resolved, size=st.size, last_modified=st.last_modified,
                           etag=(st.etag or "").strip('"'), bucket=self.bucket)
 
     def list(self, prefix: str = "", limit: int = 200) -> List[ObjectInfo]:
@@ -123,13 +146,13 @@ class MinioStore:
         return out
 
     def get_bytes(self, key: str) -> bytes:
-        key = check_key(key)
+        resolved = self.resolve_key(key) or check_key(key)
         response = None
         try:
-            response = self.client.get_object(self.bucket, key)
+            response = self.client.get_object(self.bucket, resolved)
             return response.read()
         except S3Error as exc:
-            raise self._not_found(key, exc) from exc
+            raise self._not_found(resolved, exc) from exc
         finally:
             if response is not None:
                 response.close()
@@ -137,14 +160,15 @@ class MinioStore:
 
     def download(self, key: str, dest: Optional[Path] = None) -> Path:
         """Tải về file cục bộ để reader mở. Dùng lại bản đã tải nếu etag không đổi."""
-        info = self.stat(key)
+        resolved = self.resolve_key(key) or check_key(key)
+        info = self.stat(resolved)
         if dest is None:
             if self.cache_dir is None:
                 raise ValidationError(
                     "Chưa cấu hình thư mục tạm cho kho object.",
                     hint="Đặt cache_dir khi dựng MinioStore, hoặc truyền dest.",
                 )
-            safe = check_key(key).replace("/", "__")
+            safe = check_key(resolved).replace("/", "__")
             tag = (info.etag or "notag")[:16]
             dest = self.cache_dir / f"{tag}__{safe}"
             if dest.exists() and dest.stat().st_size == info.size:

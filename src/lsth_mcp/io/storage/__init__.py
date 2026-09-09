@@ -92,12 +92,18 @@ def locate(key_or_uri: str, settings: Optional[Settings] = None) -> tuple:
     parsed = parse_uri(key_or_uri)
     if parsed:
         area, key = parsed
-        return get_store(area, settings), key
+        store = get_store(area, settings)
+        resolved = store.resolve_key(key) if hasattr(store, "resolve_key") else None
+        return store, resolved or key
 
     key = check_key(key_or_uri)
     for area in SEARCH_ORDER:
         store = get_store(area, settings)
-        if store.exists(key):
+        if hasattr(store, "resolve_key"):
+            resolved = store.resolve_key(key)
+            if resolved:
+                return store, resolved
+        elif store.exists(key):
             return store, key
 
     raise NotFoundError(
