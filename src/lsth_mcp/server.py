@@ -126,7 +126,16 @@ def excel_sheets(path: str) -> Dict[str, Any]:
     def run(trace):
         from .core.paths import resolve_within
         from .io.readers.excel import ExcelReader
+        from .io.storage import locate, using_minio
         cfg = get_settings()
+        if using_minio(cfg) or str(path).startswith("s3://"):
+            store, key = locate(str(path), cfg)
+            local = store.download(key)
+            uri = store.uri(key)
+            trace.read(uri)
+            names = ExcelReader().sheet_names(local)
+            return ok({"sheets": names, "count": len(names)},
+                      sources=[{"file": uri}])
         target = resolve_within(path, cfg.read_roots, must_exist=True)
         trace.read(target)
         names = ExcelReader().sheet_names(target)
