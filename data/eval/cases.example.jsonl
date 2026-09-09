@@ -1,0 +1,3 @@
+{"id": "term-001", "kind": "qa", "question": "TLĐG là gì?", "expected": "tài liệu đóng gói", "tags": ["thuat-ngu"], "must_cite": true}
+{"id": "term-002", "kind": "qa", "question": "FDW viết tắt của gì?", "expected": null, "tags": ["thuat-ngu", "bay-bia-tu"], "must_cite": true}
+{"id": "bom-001", "kind": "field", "question": "Định mức của mã vật tư FB-K0007-HD trong style 66P866", "expected": {"consumption": 0.216, "unit_bom": "YD"}, "tags": ["bom"], "must_cite": true}

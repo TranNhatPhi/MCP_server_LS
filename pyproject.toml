@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lsth-mcp"
+version = "0.1.0"
+description = "Hệ thống MCP server giảm workload khối BU — Lucky Star LSTH"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary" }
+authors = [{ name = "LSTH — khối kỹ thuật" }]
+
+dependencies = [
+    "mcp[cli]>=1.2.0",   # MCP SDK, cần Python 3.10+
+    "openpyxl>=3.1",     # đọc/ghi Excel — 66/107 dòng công việc đang chạy trên Excel
+    "pypdf>=4.0",        # bóc tech pack PDF 48–86 trang
+    "PyYAML>=6.0",       # cấu hình, vùng dữ liệu, kho khuôn
+]
+
+[project.optional-dependencies]
+docx = ["python-docx>=1.1"]          # đọc file Word ở data/raw
+minio = ["minio>=7.2"]               # kho object MinIO (xem docs/STORAGE.md)
+dev = ["pytest>=8.0", "ruff>=0.5", "mypy>=1.10", "minio>=7.2"]
+
+[project.scripts]
+lsth-mcp = "lsth_mcp.server:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM", "PTH"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+files = ["src"]
+ignore_missing_imports = true

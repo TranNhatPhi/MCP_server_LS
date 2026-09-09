@@ -1,0 +1,56 @@
+# MinIO — kho lưu trữ file cho lsth-mcp.
+#
+# Vì sao tách bucket thay vì một bucket nhiều thư mục: mỗi vùng dữ liệu được gán
+# một chính sách riêng ở tầng lưu trữ. Tài khoản ứng dụng KHÔNG có quyền ghi vào
+# lsth-raw và lsth-templates — nguyên tắc 8 "luôn giữ được đường làm tay" được
+# chặn ở hai lớp: trong Python (SafeWriter) và ở chính MinIO.
+#
+#   docker compose -f docker/docker-compose.yml up -d
+#   docker compose -f docker/docker-compose.yml logs -f minio-init
+#   docker compose -f docker/docker-compose.yml down          # giữ dữ liệu
+#   docker compose -f docker/docker-compose.yml down -v       # XOÁ cả dữ liệu
+
+name: lsth-mcp
+
+services:
+  minio:
+    image: quay.io/minio/minio:RELEASE.2025-04-22T22-12-26Z
+    container_name: lsth-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-lsth-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Chưa đặt MINIO_ROOT_PASSWORD trong docker/.env}
+      MINIO_BROWSER_REDIRECT_URL: http://localhost:9001
+    ports:
+      - "${MINIO_PORT:-9000}:9000"      # API S3
+      - "${MINIO_CONSOLE_PORT:-9001}:9001"  # giao diện web
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  # Chạy một lần: tạo bucket, tạo tài khoản ứng dụng, gắn chính sách rồi thoát.
+  minio-init:
+    image: quay.io/minio/mc:RELEASE.2025-04-16T18-13-26Z
+    container_name: lsth-minio-init
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-lsth-admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD}
+      LSTH_S3_ACCESS_KEY: ${LSTH_S3_ACCESS_KEY:-lsth-app}
+      LSTH_S3_SECRET_KEY: ${LSTH_S3_SECRET_KEY:?Chưa đặt LSTH_S3_SECRET_KEY trong docker/.env}
+    volumes:
+      - ./init:/init:ro
+    entrypoint: ["/bin/sh", "/init/setup.sh"]
+    restart: "no"
+
+volumes:
+  minio-data:
+    name: lsth-minio-data

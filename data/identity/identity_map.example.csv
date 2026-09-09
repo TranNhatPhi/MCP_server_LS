@@ -1,0 +1,5 @@
+ls_style,customer_style,contract_no,customer,account,market,upc,material_code,note
+LS-S27-0001,S2749189,,GA,GARAN-US,US,,,"Garan: style number = customer style"
+LS-S27-0002,66P866,REF-99881,HA,HADDAD-LK,US,,,"Haddad: style number = contract_no (Ref#)"
+LS-S27-0003,,,JK,JAKO-EU,EU,,,"Jako: cũng dùng contract_no; để trống ls_style thì ERP tự sinh"
+LS-S27-0004,,,OSAKA,,JP,,,"Osaka: dùng contract_no; UPC define có 4 loại code"

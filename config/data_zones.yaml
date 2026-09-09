@@ -1,0 +1,29 @@
+# Bốn vùng dữ liệu — chương 9 kiến trúc v1.0, nguyên tắc 6
+# "Dữ liệu ở đâu, xử lý ở đó".
+#
+#   PUBLIC     Z1  được đưa lên dịch vụ AI ngoài
+#   INTERNAL   Z2  xử lý trên hạ tầng nội bộ
+#   CUSTOMER   Z3  tài liệu khách ràng buộc NDA — tuyệt đối không ra ngoài
+#   RESTRICTED Z4  giá, hợp đồng, nhân sự — chỉ người được chỉ định
+#
+# CẢNH BÁO: bảng này là bản dự kiến. Ranh giới cuối cùng chờ kết quả rà điều
+# khoản bảo mật của 5 khách (khoảng trống G8, BU trưởng chủ trì, 1 tuần).
+# Đội đã tự dùng ChatGPT cho tài liệu khách — cần khung TRƯỚC khi việc đó lan rộng.
+
+default: INTERNAL
+
+rules:
+  "*tech*pack*": CUSTOMER
+  "*techpack*": CUSTOMER
+  "*spec*": CUSTOMER
+  "*bom*": CUSTOMER
+  "*dc*production*": CUSTOMER
+  "*sof*": CUSTOMER
+  "*price*": RESTRICTED
+  "*gia*": RESTRICTED
+  "*quotation*": RESTRICTED
+  "*hop*dong*": RESTRICTED
+  "*contract*": RESTRICTED
+  "*nhan*su*": RESTRICTED
+  "*luong*": RESTRICTED
+  "*/public/*": PUBLIC

@@ -1,0 +1,21 @@
+# F4 · Quy ước đặt tên file thống nhất.
+#
+# Hiện trạng: mỗi người một kiểu, cột "phương pháp" trong khảo sát lặp lại nhiều
+# lần cụm "file theo dõi cá nhân". Khoảng trống G5 — phải chụp lại cấu trúc thư
+# mục hiện tại trước, rồi mới chuẩn hoá được (2 ngày, kỹ thuật tự làm).
+
+patterns:
+  tldg:       "{style}_{market}_TLDG_v{rev}.xlsx"
+  worksheet:  "{style}_{customer}_WS_v{rev}.xlsx"
+  bom:        "{style}_{customer}_BOM_v{rev}.xlsx"
+  fdw:        "{style}_{market}_FDW_v{rev}.xlsx"
+  tuv_report: "{style}_TUV_{report_no}_{date}.pdf"
+  layout:     "{style}_{market}_LAYOUT_v{rev}.pdf"
+  po_draft:   "{po_no}_{vendor}_PO-NHAP_{date}.xlsx"
+
+rules:
+  - "Không dấu tiếng Việt trong tên file — dùng core.paths.slugify"
+  - "Không khoảng trắng, dùng gạch dưới"
+  - "Số phiên bản luôn có tiền tố v, tăng dần, không dùng 'final' hay 'final2'"
+  - "Ngày theo dạng YYYY-MM-DD, không dùng DD-MM"
+  - "Bản do máy dựng luôn mang hậu tố NHAP cho tới khi người soát duyệt"

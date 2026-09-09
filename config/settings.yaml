@@ -1,0 +1,30 @@
+# Cấu hình chạy. Biến môi trường LSTH_<TÊN_HOA> đè lên giá trị ở đây.
+# Không để bí mật trong file này — token đọc từ môi trường (xem .env.example).
+
+# Nguyên tắc 2 "Đọc trước, ghi sau": toàn hệ thống mặc định chỉ đọc.
+# Chỉ bật khi đã sẵn sàng, và từng server vẫn phải qua cổng write_gates riêng.
+write_enabled: false
+enforce_write_gate: true
+backup_on_overwrite: true
+
+# Ai đang gọi và với vai trò gì. Vai trò quyết định quyền theo ma trận chương 10:
+# merchandiser_owner | merchandiser_other | bu_lead | production | n8n
+# | engineer (không quyền trên dữ liệu thật) | engineer_sandbox
+actor: "phi"
+role: "engineer_sandbox"
+
+# stdio cho máy cá nhân (Claude Desktop), http cho máy chủ nội bộ.
+transport: "stdio"
+http_host: "127.0.0.1"
+http_port: 8787
+
+# Chương 11: nhật ký giữ tối thiểu 12 tháng.
+audit_retention_days: 365
+
+# Đường dẫn tương đối tính từ gốc dự án.
+raw_dir: "data/raw"
+work_dir: "data/work"
+out_dir: "data/out"
+templates_dir: "data/templates"
+identity_dir: "data/identity"
+eval_dir: "data/eval"

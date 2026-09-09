@@ -1,0 +1,39 @@
+# Dữ liệu thật không bao giờ vào git — phần lớn là tài liệu khách vùng Z3 (NDA).
+data/raw/*
+data/work/*
+data/out/*
+data/state/*
+data/audit/*
+data/cache/*
+data/identity/identity_map.csv
+data/templates/*
+data/eval/*.jsonl
+!data/**/README.md
+!data/templates/registry.yaml
+!data/identity/identity_map.example.csv
+!data/eval/cases.example.jsonl
+**/_backup/
+
+# Bí mật
+.env
+docker/.env
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Hệ điều hành
+.DS_Store
+~$*
+*.tmp
+.tmp-*

@@ -1,0 +1,33 @@
+# F4 · Kho template — khai báo các file khuôn đã duyệt.
+#
+# TRẠNG THÁI: đang RỖNG. Đây là khoảng trống G4, thứ chặn nhiều thành phần nhất
+# (S6 packing, M1 sample, M3 compliance).
+#
+# Việc cần làm trong tuần này (việc số 2 trong bốn việc đề nghị):
+# xin mỗi loại một file đã duyệt, dùng làm khuôn.
+#   TLĐG        -> chị Ly
+#   FDW         -> chị Hạnh
+#   báo cáo TUV -> chị Bích Thủy
+#   Worksheet   -> chưa xác định đầu mối
+#   BOM         -> chị Hằng / chị Phúc
+#
+# Đặt file vào data/templates/ rồi bỏ chú thích mẫu dưới đây và sửa lại cho đúng.
+
+templates: []
+
+# Mẫu một mục khai báo:
+#
+# templates:
+#   - kind: tldg                       # tldg | worksheet | bom | tuv_report | fdw
+#     file: "TLDG_GARAN_mau-duyet.xlsx"
+#     customer: GARAN
+#     market: US
+#     naming: "{style}_{market}_TLDG_v{rev}.xlsx"
+#     approved_by: "Chị Ly"
+#     approved_at: "2026-09-15"
+#     notes: "Khuôn chuẩn cho thị trường US. Ô an toàn: vị trí bắn tag ở C12."
+#     cell_map:                        # ô nào nhận giá trị nào khi máy điền
+#       style: "B3"
+#       market: "B4"
+#       hangtag_position: "C12"
+#       polybag_code: "C15"
